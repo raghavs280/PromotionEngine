@@ -24,23 +24,25 @@ namespace PromotionEngineTest
                 { "C",1}
             };
             decimal orderValue=CheckOutCart.CalculateOrderValue(listofCarts);
-            Assert.Equal(100, 100);
+            Assert.Equal(100, orderValue);
         
         }
         [Fact]
         public void Test2()
         {
-
+            var listofCarts = new Dictionary<string, int>
+            {
+                { "A",5},
+                { "B",5},
+                { "C",1},
+            };
+            decimal orderValue = CheckOutCart.CalculateOrderValue(listofCarts);
+            Assert.Equal(370, orderValue);
         }
         [Fact]
         public void Test3()
         {
 
-        }
-        [Fact]
-        public void Test4()
-        {
-
-        }
+        }       
     }
 }
