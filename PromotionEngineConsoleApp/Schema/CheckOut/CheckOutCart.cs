@@ -43,6 +43,7 @@ namespace Schema.CheckOut
                     if (skuId.Contains(","))
                     {
                         // logic for handing the one promotion exist for combination of sku ids
+                        decimal orderValueforMultipleSku = 0;
                         string[] combinedPromtionId = skuId.Split(',').ToArray();
 
                         // iterating the combined list of id's for promotion
@@ -50,8 +51,12 @@ namespace Schema.CheckOut
                         foreach (var promotionSku in combinedPromtionId)
                         {
                             // checking for other sku id which is part of promotion and validating the no of units allowed in the promotion
-                            if (items.ContainsKey(promotionSku) && item.Key != promotionSku && items[promotionSku] <= item.Value)
+                            if (items.ContainsKey(promotionSku) && items[promotionSku] <= item.Value)
+                            {
                                 isPromotionActiveforMultipleId = true;
+                                orderValueforMultipleSku += promotion.Price;
+
+                            }                                
                             else
                             {
                                 isPromotionActiveforMultipleId = false;
@@ -63,12 +68,12 @@ namespace Schema.CheckOut
                         else
                         {
                             // apply promotion price
+                            orderValue += orderValueforMultipleSku;
                         }
 
                     }
                     else
-                    {
-                        //var unitsConsiderforPromotion = item.Value;
+                    {                        
                         // checking for remainder by appling the modulus function                        
                         var remainder = item.Value % promotion.Unit;
                         orderValue += ((item.Value - remainder) / promotion.Unit) * promotion.Price;
