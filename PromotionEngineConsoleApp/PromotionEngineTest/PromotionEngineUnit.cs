@@ -42,6 +42,15 @@ namespace PromotionEngineTest
         [Fact]
         public void Test3()
         {
+            var listofCarts = new Dictionary<string, int>
+            {
+                { "A",3},
+                { "B",5},
+                { "C",1},
+                { "D",1}
+            };
+            decimal orderValue = CheckOutCart.CalculateOrderValue(listofCarts);
+            Assert.Equal(280, orderValue);
 
         }       
     }

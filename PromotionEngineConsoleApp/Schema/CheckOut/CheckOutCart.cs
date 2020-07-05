@@ -17,7 +17,7 @@ namespace Schema.CheckOut
             { "C",20},
             { "D",15},
         };
-        
+
         static List<ActivePromotion> activePromotions = new List<ActivePromotion> {
             new ActivePromotion{SKUIds="A",Price=130,Unit=3},
             new ActivePromotion{SKUIds="B",Price=45,Unit=2},
@@ -28,6 +28,7 @@ namespace Schema.CheckOut
 
             // iterating the list of items in a cart and then applying the promotion
             decimal orderValue = 0;
+            var isPromotionActiveforMultipleId = false;
 
             foreach (KeyValuePair<string, int> item in items)
             {
@@ -42,32 +43,41 @@ namespace Schema.CheckOut
                     if (skuId.Contains(","))
                     {
                         // logic for handing the one promotion exist for combination of sku ids
-                        string[] combinedPromtionId = skuId.Split(',').Skip(1).ToArray();
+                        string[] combinedPromtionId = skuId.Split(',').ToArray();
 
-                       // iterating the combined list of id's for promotion
-                       foreach(var itemlist in combinedPromtionId)
+                        // iterating the combined list of id's for promotion
+                        // TODO: revisit down logic
+                        foreach (var promotionSku in combinedPromtionId)
                         {
-                            if (items.ContainsKey(itemlist))
+                            // checking for other sku id which is part of promotion and validating the no of units allowed in the promotion
+                            if (items.ContainsKey(promotionSku) && item.Key != promotionSku && items[promotionSku] <= item.Value)
+                                isPromotionActiveforMultipleId = true;
+                            else
                             {
-
+                                isPromotionActiveforMultipleId = false;
+                                break;
                             }
-                            break;
                         }
-                        orderValue += actualPrice * item.Value;
+                        if (!isPromotionActiveforMultipleId)
+                            orderValue += actualPrice * item.Value;
+                        else
+                        {
+                            // apply promotion price
+                        }
 
                     }
                     else
                     {
                         //var unitsConsiderforPromotion = item.Value;
                         // checking for remainder by appling the modulus function                        
-                       var remainder = item.Value % promotion.Unit;                        
-                        orderValue += ((item.Value- remainder) / promotion.Unit) * promotion.Price;
-                        if(remainder > 0)
+                        var remainder = item.Value % promotion.Unit;
+                        orderValue += ((item.Value - remainder) / promotion.Unit) * promotion.Price;
+                        if (remainder > 0)
                             orderValue += actualPrice * remainder;
                     }
                 }
-                else                
-                    orderValue += actualPrice * item.Value;                
+                else
+                    orderValue += actualPrice * item.Value;
 
             }
             return orderValue;
